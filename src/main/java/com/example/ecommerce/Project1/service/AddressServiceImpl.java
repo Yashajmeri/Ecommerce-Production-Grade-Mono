@@ -7,24 +7,30 @@ import com.example.ecommerce.Project1.payload.AddressDTO;
 import com.example.ecommerce.Project1.repositories.AddressRepository;
 import com.example.ecommerce.Project1.repositories.UserRepository;
 import com.example.ecommerce.Project1.util.AuthUtil;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Represents the address service impl component.
+ */
 @Service
+@RequiredArgsConstructor
 public class AddressServiceImpl implements AddressService {
-    @Autowired
-    AuthUtil authUtil;
-    @Autowired
-    AddressRepository addressRepository;
-    @Autowired
-    ModelMapper modelMapper;
-    @Autowired
-    private UserRepository userRepository;
+    private final AuthUtil authUtil;
+    private final AddressRepository addressRepository;
+    private final ModelMapper modelMapper;
+    private final UserRepository userRepository;
 
+    /**
+     * Creates address.
+     * @param addressDTO the addressDTO value.
+     * @param user the user value.
+     * @return the result of create address.
+     */
     @Override
     public AddressDTO createAddress(AddressDTO addressDTO, User user) {
         Address address = modelMapper.map(addressDTO, Address.class);
@@ -38,12 +44,21 @@ public class AddressServiceImpl implements AddressService {
         return modelMapper.map(savedAddress, AddressDTO.class);
     }
 
+    /**
+     * Returns the all addresses.
+     * @return the all addresses.
+     */
     @Override
     public List<AddressDTO> getAllAddresses() {
          List<Address> addressList = addressRepository.findAll();
            return addressList.stream().map(address -> modelMapper.map(address, AddressDTO.class)).toList();
     }
 
+    /**
+     * Returns the addresses by id.
+     * @param addressId the addressId value.
+     * @return the addresses by id.
+     */
     @Override
     public AddressDTO getAddressesById(Long addressId) {
         Address address = addressRepository.findById(addressId).orElseThrow(() -> new ResourceNotFoundException("Address", "id", addressId));
@@ -51,6 +66,11 @@ public class AddressServiceImpl implements AddressService {
         return  modelMapper.map(address, AddressDTO.class);
     }
 
+    /**
+     * Returns the addresses by user.
+     * @param user the user value.
+     * @return the addresses by user.
+     */
     @Override
     public List<AddressDTO> getAddressesByUser(User user) {
         List<Address> addressList = user.getAddresses();
@@ -58,6 +78,12 @@ public class AddressServiceImpl implements AddressService {
         return addressList.stream().map(address -> modelMapper.map(address, AddressDTO.class)).toList();
     }
 
+    /**
+     * Updates addresses by id.
+     * @param addressId the addressId value.
+     * @param addressDTO the addressDTO value.
+     * @return the result of update addresses by id.
+     */
     @Override
     public AddressDTO updateAddressesById(Long addressId, AddressDTO addressDTO) {
          Address addressFromDatabase = addressRepository.findById(addressId).orElseThrow(() -> new ResourceNotFoundException("Address", "id", addressId));
@@ -77,6 +103,11 @@ public class AddressServiceImpl implements AddressService {
         return modelMapper.map(updatedAddress, AddressDTO.class);
     }
 
+    /**
+     * Deletes addresses by id.
+     * @param addressId the addressId value.
+     * @return the result of delete addresses by id.
+     */
     @Override
     public String  deleteAddressesById(Long addressId) {
          Address addressFromDB = addressRepository.findById(addressId).orElseThrow(() -> new ResourceNotFoundException("Address", "id", addressId));

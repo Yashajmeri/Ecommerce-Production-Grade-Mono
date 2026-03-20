@@ -1,29 +1,31 @@
 package com.example.ecommerce.Project1.controller;
 
 import com.example.ecommerce.Project1.config.AppConstant;
-import com.example.ecommerce.Project1.model.Category;
 import com.example.ecommerce.Project1.payload.CategoryDTO;
 import com.example.ecommerce.Project1.payload.CategoryResponse;
 import com.example.ecommerce.Project1.service.CategoryService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
-import java.util.List;
-
+/**
+ * Represents the category controller component.
+ */
 @RestController
+@RequiredArgsConstructor
 public class CategoryController {
-    @Autowired
-    private CategoryService categoryService;
-//     //  Contructor - DependencyInjection
-//     public CategoryController(CategoryService categoryService) {
-//         this.categoryService = categoryService;
-//     }
+    private final CategoryService categoryService;
 
+    /**
+     * Returns the all categories.
+     * @param PageNumber the PageNumber value.
+     * @param PageSize the PageSize value.
+     * @param sortBy the sortBy value.
+     * @param sortOrder the sortOrder value.
+     * @return the all categories.
+     */
     @GetMapping("/api/public/categories")
     public ResponseEntity<CategoryResponse> getAllCategories(@RequestParam(name = "pageNumber", defaultValue = AppConstant.PAGE_NUMBER,required = false) Integer PageNumber,
                                                              @RequestParam(name = "pageSize", defaultValue = AppConstant.PAGE_SIZE,required = false) Integer PageSize,
@@ -32,20 +34,33 @@ public class CategoryController {
         return ResponseEntity.ok(categoryService.getAllCategories(PageNumber, PageSize, sortBy, sortOrder));
     }
 
+    /**
+     * Executes ctreate category.
+     * @param categoryDTO the categoryDTO value.
+     * @return the result of ctreate category.
+     */
     @PostMapping("/api/public/categories")
     public ResponseEntity<CategoryDTO> CtreateCategory(@Valid @RequestBody CategoryDTO categoryDTO) {
         CategoryDTO savedCategoryDTO = categoryService.CreateCategory(categoryDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedCategoryDTO);
     }
 
+    /**
+     * Deletes category.
+     * @param categoryId the categoryId value.
+     * @return the result of delete category.
+     */
     @DeleteMapping("/api/admin/categories/{categoryId}")
     public ResponseEntity<CategoryDTO> DeleteCategory(@PathVariable Long categoryId) {
-        // cleaned the Controller by removing try - catch  : video 106
         return new ResponseEntity<>(categoryService.DeleteCategory(categoryId), HttpStatus.OK);
-
-
     }
 
+    /**
+     * Updates category.
+     * @param categoryDTO the categoryDTO value.
+     * @param categoryId the categoryId value.
+     * @return the result of update category.
+     */
     @PutMapping("/api/admin/categories/{categoryId}")
     public ResponseEntity<CategoryDTO> UpdateCategory(@Valid @RequestBody CategoryDTO categoryDTO, @PathVariable Long categoryId) {
 

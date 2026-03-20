@@ -6,9 +6,9 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -17,13 +17,23 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+/**
+ * Represents the auth token filter component.
+ */
 @Component
+@RequiredArgsConstructor
 public class AuthTokenFilter extends OncePerRequestFilter {
-    @Autowired
-    private  JwtUtils jwtUtils;
-    @Autowired
-    private UserDetailsServiceImpl userDetailsService;
-    private Logger logger = LoggerFactory.getLogger(AuthTokenFilter.class);
+    private final JwtUtils jwtUtils;
+    private final UserDetailsServiceImpl userDetailsService;
+    private final Logger logger = LoggerFactory.getLogger(AuthTokenFilter.class);
+    /**
+     * Executes do filter internal.
+     * @param request the request value.
+     * @param response the response value.
+     * @param filterChain the filterChain value.
+     * @throws ServletException if the operation cannot be completed.
+     * @throws IOException if the operation cannot be completed.
+     */
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
@@ -44,11 +54,16 @@ public class AuthTokenFilter extends OncePerRequestFilter {
         }catch (Exception e) {
             logger.error(e.getMessage());
         }
-        filterChain.doFilter(request, response); // telling Spring Security to continue from here
+        filterChain.doFilter(request, response);
     }
 
+    /**
+     * Executes parse jwt.
+     * @param request the request value.
+     * @return the result of parse jwt.
+     */
     private String parseJwt(HttpServletRequest request) {
-        String jwt = jwtUtils.getJwtFromCookies(request);
+        String jwt = jwtUtils.getJwtFromHeader(request);
         logger.debug("AuthTokenFilter.java: {}",jwt);
         return jwt;
     }

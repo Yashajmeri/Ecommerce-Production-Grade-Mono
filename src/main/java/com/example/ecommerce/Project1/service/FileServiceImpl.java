@@ -9,28 +9,31 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.UUID;
 
+/**
+ * Represents the file service impl component.
+ */
 @Service
 public class FileServiceImpl  implements  FileService {
+    /**
+     * Uploads image.
+     * @param path the path value.
+     * @param file the file value.
+     * @return the result of upload image.
+     * @throws IOException if the operation cannot be completed.
+     */
     @Override
     public String uploadImage(String path, MultipartFile file) throws IOException {
-        // get the file name of the original file
         String originalFilename = file.getOriginalFilename();
-        // We will generate the unique file name
         String randomId = UUID.randomUUID().toString();
-        //        assert originalFilename != null;
         assert originalFilename != null;
         String fileName = randomId.concat(originalFilename.substring(originalFilename.lastIndexOf(".")));
         String filePath = path+ File.separator+fileName;
 
-
-        // check if file exist
         File folder = new File(path);
         if (!folder.exists()) {
             folder.mkdirs();
         }
-        // upload  to the server
         Files.copy(file.getInputStream(), Paths.get(filePath));
-        // return the file  name
         return fileName;
     }
 }

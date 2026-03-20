@@ -10,6 +10,9 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Represents the order component.
+ */
 @Entity
 @Table(name="orders")
 @Data
@@ -23,6 +26,10 @@ public class Order {
     @Column(nullable = false) // means null value is accepted here
     private String email;
 
+    /**
+     * Executes array list<>.
+     * @return the result of array list<>.
+     */
     @OneToMany(mappedBy = "order",cascade = {CascadeType.PERSIST,CascadeType.MERGE})
     private List<OrderItem> orderItems = new ArrayList<>();
     private LocalDate orderDate;

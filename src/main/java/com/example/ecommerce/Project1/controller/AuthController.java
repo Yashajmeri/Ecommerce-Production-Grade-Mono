@@ -11,10 +11,8 @@ import com.example.ecommerce.Project1.security.response.UserInfoResponse;
 import com.example.ecommerce.Project1.security.JWT.JwtUtils;
 import com.example.ecommerce.Project1.security.services.UserDetailsImpl;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -28,19 +26,23 @@ import org.springframework.web.bind.annotation.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Represents the auth controller component.
+ */
 @RestController
 @RequestMapping("/api/auth")
+@RequiredArgsConstructor
 public class AuthController {
-    @Autowired
-    private AuthenticationManager authenticationManager;
-    @Autowired
-    private JwtUtils jwtUtils;
-    @Autowired
-    UserRepository userRepository;
-    @Autowired
-    PasswordEncoder passwordEncoder;
-    @Autowired
-    RoleRepository roleRepository;
+    private final AuthenticationManager authenticationManager;
+    private final JwtUtils jwtUtils;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final RoleRepository roleRepository;
+    /**
+     * Authenticates user.
+     * @param loginRequest the loginRequest value.
+     * @return the result of authenticate user.
+     */
     @PostMapping("/signin")
     public ResponseEntity<?> AuthenticateUser(@RequestBody LoginRequest loginRequest) {
         Authentication authentication;
@@ -62,14 +64,17 @@ public class AuthController {
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-        ResponseCookie jwtCookie = jwtUtils.generateJwtCookie(userDetails);
+        String jwtToken = jwtUtils.generateToken(userDetails);
         List<String> roles = userDetails.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority).toList();
-        UserInfoResponse response = new UserInfoResponse(userDetails.getUsername(),roles,userDetails.getId());
-        // Remove Jwt Token from above constructor , we have different ways to do that.
-//        return ResponseEntity.ok(response); // Token Way
-        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, jwtCookie.toString()).body(response); // Cookie way to response
+        UserInfoResponse response = new UserInfoResponse(jwtToken, userDetails.getUsername(), roles, userDetails.getId());
+        return ResponseEntity.ok(response);
     }
+    /**
+     * Registers user.
+     * @param request the request value.
+     * @return the result of register user.
+     */
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignUpRequest request) {
 
@@ -117,10 +122,20 @@ public class AuthController {
         userRepository.save(user);
         return ResponseEntity.ok(new MessageResponse("User registered successfully."));
     }
+    /**
+     * Returns the current user name.
+     * @param authentication the authentication value.
+     * @return the current user name.
+     */
     @GetMapping("/username")
     public  String currentUserName(Authentication authentication) {
        return authentication != null ? authentication.getName() :"NULL";
     }
+    /**
+     * Returns the current user details.
+     * @param authentication the authentication value.
+     * @return the current user details.
+     */
     @GetMapping("/user")
     public  ResponseEntity<?> currentUserDetails(Authentication authentication) {
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
@@ -130,9 +145,14 @@ public class AuthController {
         return ResponseEntity.ok(userInfoResponse);
 
     }
+    /**
+     * Executes sign out.
+     * @return the result of sign out.
+     */
     @PostMapping("/signout")
-    public  ResponseEntity<?> signOut(Authentication authentication) {
-        return  ResponseEntity.ok().header(HttpHeaders.SET_COOKIE,jwtUtils.getCleanCookie().toString()).body(new MessageResponse("You've been signed out!"));
+    public  ResponseEntity<?> signOut() {
+        SecurityContextHolder.clearContext();
+        return ResponseEntity.ok(new MessageResponse("You've been signed out!"));
     }
 
 }

@@ -4,6 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Represents the api response component.
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

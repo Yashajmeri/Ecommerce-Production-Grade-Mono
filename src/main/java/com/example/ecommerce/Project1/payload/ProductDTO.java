@@ -4,6 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Represents the product dto component.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

@@ -7,6 +7,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Represents the payment component.
+ */
 @Entity
 @Table(name="payments")
 @Data
@@ -29,6 +32,14 @@ public class Payment {
     private String pgResponseMessage;
     private String pgName;
 
+  /**
+   * Creates a new `Payment` instance.
+   * @param paymentMethod the paymentMethod value.
+   * @param pgPaymentId the pgPaymentId value.
+   * @param pgStatus the pgStatus value.
+   * @param pgResponseMessage the pgResponseMessage value.
+   * @param pgName the pgName value.
+   */
   public Payment(String paymentMethod, String pgPaymentId, String pgStatus, String pgResponseMessage, String pgName) {
       this.paymentMethod =paymentMethod;
       this.pgPaymentId = pgPaymentId;

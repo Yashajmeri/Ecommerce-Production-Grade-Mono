@@ -4,6 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Represents the order item dto component.
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

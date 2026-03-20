@@ -16,9 +16,20 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Represents the auth entry point jwt component.
+ */
 @Component
 public class AuthEntryPointJwt implements AuthenticationEntryPoint {
     private static final Logger logger = LoggerFactory.getLogger(AuthEntryPointJwt.class);
+    /**
+     * Executes commence.
+     * @param request the request value.
+     * @param response the response value.
+     * @param authException the authException value.
+     * @throws IOException if the operation cannot be completed.
+     * @throws ServletException if the operation cannot be completed.
+     */
     @Override
     public void commence(HttpServletRequest request,
                          HttpServletResponse response,
@@ -27,7 +38,6 @@ public class AuthEntryPointJwt implements AuthenticationEntryPoint {
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 
-        //This One is Optional But UnderStanding it is Very IMP
         final Map<String,Object>  body = new HashMap<String,Object>();
         body.put("error", "UnAuthorized");
         body.put("Status", HttpServletResponse.SC_UNAUTHORIZED);

@@ -6,6 +6,9 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
+/**
+ * Represents the category response component.
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

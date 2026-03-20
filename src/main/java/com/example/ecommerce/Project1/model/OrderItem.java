@@ -5,6 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Represents the order item component.
+ */
 @Entity
 @Table(name="order_items")
 @Data

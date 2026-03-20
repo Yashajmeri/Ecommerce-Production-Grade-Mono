@@ -5,11 +5,12 @@ import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
-
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Represents the address component.
+ */
 @Entity
 @Table(name="addresses")
 @Data
@@ -33,6 +34,15 @@ public class Address {
     @Size(min=6, message = "Pin code  must be at least 6 characters ")
     private String pincode;
 
+    /**
+     * Creates a new `Address` instance.
+     * @param street the street value.
+     * @param buildingName the buildingName value.
+     * @param city the city value.
+     * @param state the state value.
+     * @param country the country value.
+     * @param pincode the pincode value.
+     */
     public Address(String street, String buildingName, String city, String state, String country, String pincode) {
         this.street = street;
         this.buildingName = buildingName;
@@ -41,8 +51,6 @@ public class Address {
         this.country = country;
         this.pincode = pincode;
     }
-
-//    @ToString.Exclude
     @ManyToOne
     @JoinColumn(name = "userId")
     private User user;

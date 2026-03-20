@@ -5,6 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Represents the cart item component.
+ */
 @Entity
 @Data
 @NoArgsConstructor

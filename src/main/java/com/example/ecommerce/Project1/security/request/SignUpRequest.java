@@ -7,6 +7,9 @@ import lombok.Data;
 
 import java.util.Set;
 
+/**
+ * Represents the sign up request component.
+ */
 @Data
 public class SignUpRequest {
     @NotBlank

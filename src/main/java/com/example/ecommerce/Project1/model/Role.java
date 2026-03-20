@@ -6,6 +6,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+/**
+ * Represents the role component.
+ */
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
@@ -21,6 +24,10 @@ public class Role {
     @Column(length = 20,name = "role_name")
     private AppRole roleName;
 
+    /**
+     * Creates a new `Role` instance.
+     * @param roleName the roleName value.
+     */
     public Role(AppRole roleName) {
         this.roleName = roleName;
     }

@@ -19,6 +19,9 @@ import java.util.Set;
         @UniqueConstraint(columnNames = "username"),
         @UniqueConstraint(columnNames = "email")
 })
+/**
+ * Represents the user component.
+ */
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,6 +38,12 @@ public class User {
     @Email
     @Column(name="email")
     private String email;
+    /**
+     * Creates a new `User` instance.
+     * @param username the username value.
+     * @param email the email value.
+     * @param password the password value.
+     */
     public User(String username, String email, String password) {
         this.username = username;
         this.email = email;
@@ -45,13 +54,19 @@ public class User {
     @ManyToMany(fetch = FetchType.EAGER,cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(name = "user_role",joinColumns = @JoinColumn(name="user_Id"),
     inverseJoinColumns = @JoinColumn(name="role_id"))
+/**
+ * Executes hash set<>.
+ * @return the result of hash set<>.
+ */
 private Set<Role> roles = new HashSet<>();
 
+    /**
+     * Executes array list<>.
+     * @return the result of array list<>.
+     */
     @Getter
     @Setter
     @OneToMany(mappedBy = "user", cascade = {CascadeType.PERSIST,CascadeType.MERGE},orphanRemoval = true)
-//    @JoinTable(name="user_addresses",
-//    joinColumns = @JoinColumn(name = "userId"),inverseJoinColumns = @JoinColumn(name="addressId"))
     private List<Address> addresses = new ArrayList<>();
     @ToString.Exclude
     @OneToOne(mappedBy = "user",cascade = {CascadeType.PERSIST, CascadeType.MERGE},orphanRemoval = true)

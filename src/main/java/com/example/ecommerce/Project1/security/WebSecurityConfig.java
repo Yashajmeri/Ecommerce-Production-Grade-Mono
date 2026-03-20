@@ -8,14 +8,13 @@ import com.example.ecommerce.Project1.repositories.RoleRepository;
 import com.example.ecommerce.Project1.repositories.UserRepository;
 import com.example.ecommerce.Project1.security.JWT.AuthEntryPointJwt;
 import com.example.ecommerce.Project1.security.JWT.AuthTokenFilter;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
@@ -30,20 +29,21 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import java.util.Set;
 
+/**
+ * Represents the web security config component.
+ */
 @Configuration
 @EnableWebSecurity
-//@EnableMethodSecurity
+@RequiredArgsConstructor
 public class WebSecurityConfig {
-    @Autowired
-    UserDetailsService userDetailsService;
-    @Autowired
-    private AuthEntryPointJwt unAuthorizeHandler;
+    private final UserDetailsService userDetailsService;
+    private final AuthEntryPointJwt unAuthorizeHandler;
+    private final AuthTokenFilter authTokenFilter;
 
-    @Bean
-    public AuthTokenFilter authenticationJwtTokenFilter() {
-        return new AuthTokenFilter();
-    }
-
+    /**
+     * Executes authentication provider.
+     * @return the result of authentication provider.
+     */
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
@@ -52,18 +52,32 @@ public class WebSecurityConfig {
         return authProvider;
     }
 
+    /**
+     * Executes authentication manager.
+     * @param authConfiguration the authConfiguration value.
+     * @return the result of authentication manager.
+     * @throws Exception if the operation cannot be completed.
+     */
     @Bean
-    // Exposing authenticationManger
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfiguration) throws Exception {
         return authConfiguration.getAuthenticationManager();
     }
 
+    /**
+     * Executes password encoder.
+     * @return the result of password encoder.
+     */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    //filter
+    /**
+     * Executes filter chain.
+     * @param http the http value.
+     * @return the result of filter chain.
+     * @throws Exception if the operation cannot be completed.
+     */
     @Bean
     public SecurityFilterChain FilterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
@@ -71,23 +85,23 @@ public class WebSecurityConfig {
                 .sessionManagement(session ->
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         http.authorizeHttpRequests((auth) -> auth.requestMatchers("/api/auth/**").permitAll()
-//                .requestMatchers("/error").permitAll()
                 .requestMatchers("/v3/api-docs/**").permitAll()
                 .requestMatchers("/swagger-ui/**").permitAll()
                 .requestMatchers("/h2-console/**").permitAll()
-//                .requestMatchers("/api/public/**").permitAll()
-//                .requestMatchers("/api/admin/**").permitAll()
                 .requestMatchers("/api/test/**").permitAll()
                 .requestMatchers("/api/images/**").permitAll()
 
                 .anyRequest().authenticated());
         http.authenticationProvider(authenticationProvider());
-        http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(authTokenFilter, UsernamePasswordAuthenticationFilter.class);
         http.headers(heades->heades.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin));
         return http.build();
-
     }
-    // Completely bypass filter
+
+    /**
+     * Executes web security customizer.
+     * @return the result of web security customizer.
+     */
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
         return (web -> web.ignoring().requestMatchers("/v2.api-docs/**",
@@ -97,10 +111,16 @@ public class WebSecurityConfig {
                 "/swagger-ui.html",
                 "webjars/**"));
     }
+    /**
+     * Executes init data.
+     * @param roleRepository the roleRepository value.
+     * @param userRepository the userRepository value.
+     * @param passwordEncoder the passwordEncoder value.
+     * @return the result of init data.
+     */
     @Bean
     public CommandLineRunner initData(RoleRepository roleRepository, UserRepository userRepository, PasswordEncoder passwordEncoder) {
         return args -> {
-            // Retrieve or create roles
             Role userRole = roleRepository.findByRoleName(AppRole.ROLE_USER)
                     .orElseGet(() -> {
                         Role newUserRole = new Role(AppRole.ROLE_USER);
@@ -123,8 +143,6 @@ public class WebSecurityConfig {
             Set<Role> sellerRoles = Set.of(sellerRole);
             Set<Role> adminRoles = Set.of(userRole, sellerRole, adminRole);
 
-
-            // Create users if not already present
             if (!userRepository.existsByUsername("user1")) {
                 User user1 = new User("user1", "user1@example.com", passwordEncoder.encode("password1"));
                 userRepository.save(user1);
@@ -140,7 +158,6 @@ public class WebSecurityConfig {
                 userRepository.save(admin);
             }
 
-            // Update roles for existing users
             userRepository.findByUsername("user1").ifPresent(user -> {
                 user.setRoles(userRoles);
                 userRepository.save(user);

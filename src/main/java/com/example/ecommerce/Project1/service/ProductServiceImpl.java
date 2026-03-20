@@ -11,8 +11,8 @@ import com.example.ecommerce.Project1.payload.ProductResponse;
 import com.example.ecommerce.Project1.repositories.CartRepository;
 import com.example.ecommerce.Project1.repositories.CategoryRepository;
 import com.example.ecommerce.Project1.repositories.ProductRepository;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -28,22 +28,26 @@ import java.util.List;
 import java.util.stream.Stream;
 
 
+/**
+ * Represents the product service impl component.
+ */
 @Service
+@RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService {
-    @Autowired
-    private ProductRepository productRepository;
-    @Autowired
-    private CategoryRepository categoryRepository;
-    @Autowired
-    private ModelMapper modelMapper;
-    @Autowired
-    private FileService fileService;
+    private final ProductRepository productRepository;
+    private final CategoryRepository categoryRepository;
+    private final ModelMapper modelMapper;
+    private final FileService fileService;
     @Value("${project.image}")
     private String path;
-    @Autowired
-    private CartRepository cartRepository;
-    @Autowired
-    private CartService cartService;
+    private final CartRepository cartRepository;
+    private final CartService cartService;
+    /**
+     * Adds product.
+     * @param categoryId the categoryId value.
+     * @param productDTO the productDTO value.
+     * @return the result of add product.
+     */
     @Override
     public ProductDTO addProduct(Long categoryId, ProductDTO productDTO) {
 
@@ -73,6 +77,14 @@ public class ProductServiceImpl implements ProductService {
 
     }
 
+    /**
+     * Returns the all products.
+     * @param pageNumber the pageNumber value.
+     * @param pageSize the pageSize value.
+     * @param sortBy the sortBy value.
+     * @param sortOrder the sortOrder value.
+     * @return the all products.
+     */
     @Override
     public ProductResponse getAllProducts(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
         Sort sortByAndOrder = sortOrder.equalsIgnoreCase("asc")
@@ -86,9 +98,6 @@ public class ProductServiceImpl implements ProductService {
         List<Product> products = productPage.getContent();
         List<ProductDTO> productDTOS = products.stream()
                 .map(product -> modelMapper.map(product, ProductDTO.class)).toList();
-//        if (productDTOS.isEmpty()) {
-//            throw new APIException("No products found!");
-//        }
         ProductResponse productResponse = new ProductResponse();
         productResponse.setContent(productDTOS);
         productResponse.setPageNumber(productPage.getNumber());
@@ -100,6 +109,15 @@ public class ProductServiceImpl implements ProductService {
         return productResponse;
     }
 
+    /**
+     * Searches by category.
+     * @param categoryId the categoryId value.
+     * @param pageNumber the pageNumber value.
+     * @param pageSize the pageSize value.
+     * @param sortBy the sortBy value.
+     * @param sortOrder the sortOrder value.
+     * @return the result of search by category.
+     */
     @Override
     public ProductResponse searchByCategory(Long categoryId, Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
         Category category = categoryRepository.findById(categoryId).orElseThrow(() ->
@@ -113,7 +131,6 @@ public class ProductServiceImpl implements ProductService {
         Page<Product> productPage = productRepository.findByCategoryOrderByPriceAsc(category,pageDetails);
 
         List<Product> products = productPage.getContent();
-//        List<Product> products = productRepository.findByCategoryOrderByPriceAsc(category);
         List<ProductDTO> productDTOS = products.stream().map(product -> modelMapper.map(product, ProductDTO.class))
                 .toList();
         ProductResponse productResponse = new ProductResponse();
@@ -126,6 +143,15 @@ public class ProductServiceImpl implements ProductService {
         return productResponse;
     }
 
+    /**
+     * Searches by product by keyword.
+     * @param keyword the keyword value.
+     * @param pageNumber the pageNumber value.
+     * @param pageSize the pageSize value.
+     * @param sortBy the sortBy value.
+     * @param sortOrder the sortOrder value.
+     * @return the result of search by product by keyword.
+     */
     @Override
     public ProductResponse searchByProductByKeyword(String keyword, Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
 
@@ -141,9 +167,6 @@ public class ProductServiceImpl implements ProductService {
         if (products.isEmpty()) {
             throw new APIException("No products found!");
         }
-//        List<Product> products = productRepository.findByProductNameLikeIgnoreCase('%' + keyword + '%');
-        // we can not create findByKeyword because keyword is not thr field
-        // Since we are using pattern matching with keyword we should append both side   with %;
         List<ProductDTO> productDTOS = products.stream().map(product -> modelMapper.map(product, ProductDTO.class))
                 .toList();
         ProductResponse productResponse = new ProductResponse();
@@ -156,6 +179,12 @@ public class ProductServiceImpl implements ProductService {
         return productResponse;
     }
 
+    /**
+     * Executes up date product.
+     * @param productId the productId value.
+     * @param productDTO the productDTO value.
+     * @return the result of up date product.
+     */
     @Override
     public ProductDTO upDateProduct(Long productId, ProductDTO productDTO) {
         Product productFromDB = productRepository.findById(productId).orElseThrow(() -> new ResourceNotFoundException("Product", "product Id", productId));
@@ -182,6 +211,11 @@ public class ProductServiceImpl implements ProductService {
         return modelMapper.map(SavedProduct, ProductDTO.class);
     }
 
+    /**
+     * Deletes product.
+     * @param productId the productId value.
+     * @return the result of delete product.
+     */
     @Override
     public ProductDTO deleteProduct(Long productId) {
         Product product = productRepository.findById(productId).orElseThrow(
@@ -193,21 +227,22 @@ public class ProductServiceImpl implements ProductService {
         return modelMapper.map(product, ProductDTO.class);
     }
 
+    /**
+     * Executes up date product image.
+     * @param productId the productId value.
+     * @param image the image value.
+     * @return the result of up date product image.
+     * @throws IOException if the operation cannot be completed.
+     */
     @Override
     public ProductDTO upDateProductImage(Long productId, MultipartFile image) throws IOException {
-        // Get the product form the DB
         Product product = productRepository.findById(productId).orElseThrow(
                 () -> new ResourceNotFoundException("Product", "productId", productId)
         );
 
-        // upload image to the server
-        // Get the file name od the uploaded Image
         String fileName = fileService.uploadImage(path, image);
-        //updating the new file name to the product
         product.setImage(fileName);
-        // save the updated product to the product repo
         Product savedProduct = productRepository.save(product);
-        // return productDTO
         return modelMapper.map(savedProduct, ProductDTO.class);
     }
 

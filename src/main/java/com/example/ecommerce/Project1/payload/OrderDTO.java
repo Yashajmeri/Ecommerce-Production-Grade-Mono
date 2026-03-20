@@ -9,6 +9,9 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Represents the order dto component.
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -19,10 +22,9 @@ public class OrderDTO {
     private List<OrderItemDTO> orderItems; //
     private LocalDate orderDate;
 
-    private PaymentDTO payment; //
+    private PaymentDTO payment;
 
     private Double totalAmount;
     private String orderStatus;
     private Long addressId;
-//    private AddressDTO addressDTO;
 }
