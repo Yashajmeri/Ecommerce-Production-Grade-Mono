@@ -26,7 +26,7 @@ public class UserDetailsImpl implements UserDetails {
 
     private String username;
     private String email;
-    @JsonIgnore // this ensures that password is not being serialized in jason response
+    @JsonIgnore // this ensures that password is not serialized in the JSON response
     private String password;
     private Collection<? extends GrantedAuthority> authorities;
     /**

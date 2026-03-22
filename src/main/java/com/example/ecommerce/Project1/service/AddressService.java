@@ -28,7 +28,7 @@ public interface AddressService {
      * @param addressId the addressId value.
      * @return the addresses by id.
      */
-    AddressDTO getAddressesById(Long addressId);
+    AddressDTO getAddressById(Long addressId);
 
     /**
      * Returns the addresses by user.
@@ -43,12 +43,12 @@ public interface AddressService {
      * @param addressDTO the addressDTO value.
      * @return the result of update addresses by id.
      */
-    AddressDTO updateAddressesById(Long addressId, AddressDTO addressDTO);
+    AddressDTO updateAddressById(Long addressId, AddressDTO addressDTO);
 
     /**
      * Deletes addresses by id.
      * @param addressId the addressId value.
      * @return the result of delete addresses by id.
      */
-    String deleteAddressesById(Long addressId);
+    String deleteAddressById(Long addressId);
 }

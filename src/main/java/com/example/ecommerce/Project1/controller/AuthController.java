@@ -16,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
@@ -44,7 +45,8 @@ public class AuthController {
      * @return the result of authenticate user.
      */
     @PostMapping("/signin")
-    public ResponseEntity<?> AuthenticateUser(@RequestBody LoginRequest loginRequest) {
+    @PreAuthorize("permitAll()")
+    public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) {
         Authentication authentication;
         try {
             authentication = authenticationManager.authenticate(
@@ -76,15 +78,16 @@ public class AuthController {
      * @return the result of register user.
      */
     @PostMapping("/signup")
+    @PreAuthorize("permitAll()")
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignUpRequest request) {
 
          if(userRepository.existsByUsername(request.getUsername())) {
              return ResponseEntity.badRequest()
-                     .body(new MessageResponse("Error : Username "+request.getUsername() +"Already Exist !!"));
+                     .body(new MessageResponse("Error : Username " + request.getUsername() + " already exists!!"));
          }
          if(userRepository.existsByEmail(request.getEmail())) {
              return ResponseEntity.badRequest()
-                     .body(new MessageResponse("Error: Email "+ request.getEmail()+"already Exist !"));
+                     .body(new MessageResponse("Error: Email " + request.getEmail() + " already exists!"));
 
          }
                 User user = new User(request.getUsername(),
@@ -128,7 +131,8 @@ public class AuthController {
      * @return the current user name.
      */
     @GetMapping("/username")
-    public  String currentUserName(Authentication authentication) {
+    @PreAuthorize("isAuthenticated()")
+    public String getCurrentUsername(Authentication authentication) {
        return authentication != null ? authentication.getName() :"NULL";
     }
     /**
@@ -137,7 +141,8 @@ public class AuthController {
      * @return the current user details.
      */
     @GetMapping("/user")
-    public  ResponseEntity<?> currentUserDetails(Authentication authentication) {
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> getCurrentUserDetails(Authentication authentication) {
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
         List<String> roles = userDetails.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority).toList();
@@ -150,6 +155,7 @@ public class AuthController {
      * @return the result of sign out.
      */
     @PostMapping("/signout")
+    @PreAuthorize("isAuthenticated()")
     public  ResponseEntity<?> signOut() {
         SecurityContextHolder.clearContext();
         return ResponseEntity.ok(new MessageResponse("You've been signed out!"));

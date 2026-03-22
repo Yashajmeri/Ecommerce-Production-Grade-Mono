@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -29,6 +30,7 @@ public class AddressController {
      * @return the result of create address.
      */
     @PostMapping("/addresses")
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
  public ResponseEntity<AddressDTO>   createAddress(@Valid @RequestBody AddressDTO addressDTO){
         User user = authUtil.loggedInUser();
        AddressDTO newAddressDTO = addressService.createAddress(addressDTO,user);
@@ -39,6 +41,7 @@ public class AddressController {
   * @return the all addresses.
   */
  @GetMapping("/addresses")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<AddressDTO>> getAllAddresses(){
 
       List<AddressDTO> addressDTOList = addressService.getAllAddresses();
@@ -50,9 +53,10 @@ public class AddressController {
   * @return the addresses by id.
   */
  @GetMapping("/addresses/{addressId}")
- public ResponseEntity<AddressDTO> getAddressesById(@PathVariable Long addressId){
+ @PreAuthorize("hasRole('ADMIN')")
+ public ResponseEntity<AddressDTO> getAddressById(@PathVariable Long addressId){
 
-     AddressDTO addressDTO = addressService.getAddressesById(addressId);
+     AddressDTO addressDTO = addressService.getAddressById(addressId);
      return new ResponseEntity<>(addressDTO, HttpStatus.OK);
  }
     /**
@@ -60,6 +64,7 @@ public class AddressController {
      * @return the addresses by user.
      */
     @GetMapping("/users/addresses")
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
     public ResponseEntity<List<AddressDTO>> getAddressesByUser(){
            User user = authUtil.loggedInUser();
         List<AddressDTO> addressDTOList = addressService.getAddressesByUser(user);
@@ -72,9 +77,10 @@ public class AddressController {
      * @return the result of update addresses by id.
      */
     @PutMapping("/addresses/{addressId}")
-    public ResponseEntity<AddressDTO> updateAddressesById(@PathVariable Long addressId , @RequestBody AddressDTO addressDTO){
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
+    public ResponseEntity<AddressDTO> updateAddressById(@PathVariable Long addressId , @RequestBody AddressDTO addressDTO){
 
-        AddressDTO updatedAddressDTO = addressService.updateAddressesById(addressId ,addressDTO);
+        AddressDTO updatedAddressDTO = addressService.updateAddressById(addressId ,addressDTO);
         return new ResponseEntity<>(updatedAddressDTO, HttpStatus.OK);
     }
     /**
@@ -83,9 +89,10 @@ public class AddressController {
      * @return the result of delete addresses by id.
      */
     @DeleteMapping("/addresses/{addressId}")
-    public ResponseEntity<String> deleteAddressesById(@PathVariable Long addressId){
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
+    public ResponseEntity<String> deleteAddressById(@PathVariable Long addressId){
 
-        String status = addressService.deleteAddressesById(addressId);
+        String status = addressService.deleteAddressById(addressId);
         return new ResponseEntity<>(status, HttpStatus.OK);
     }
 }

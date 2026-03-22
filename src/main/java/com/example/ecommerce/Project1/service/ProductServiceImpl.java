@@ -153,7 +153,7 @@ public class ProductServiceImpl implements ProductService {
      * @return the result of search by product by keyword.
      */
     @Override
-    public ProductResponse searchByProductByKeyword(String keyword, Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
+    public ProductResponse searchProductByKeyword(String keyword, Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
 
         Sort sortByAndOrder = sortOrder.equalsIgnoreCase("asc")
                 ? Sort.by(sortBy).ascending()
@@ -186,7 +186,7 @@ public class ProductServiceImpl implements ProductService {
      * @return the result of up date product.
      */
     @Override
-    public ProductDTO upDateProduct(Long productId, ProductDTO productDTO) {
+    public ProductDTO updateProduct(Long productId, ProductDTO productDTO) {
         Product productFromDB = productRepository.findById(productId).orElseThrow(() -> new ResourceNotFoundException("Product", "product Id", productId));
         Product product = modelMapper.map(productDTO, Product.class);
         productFromDB.setProductName(product.getProductName());
@@ -228,14 +228,14 @@ public class ProductServiceImpl implements ProductService {
     }
 
     /**
-     * Executes up date product image.
+     * Updates product image.
      * @param productId the productId value.
      * @param image the image value.
-     * @return the result of up date product image.
+     * @return the result of update product image.
      * @throws IOException if the operation cannot be completed.
      */
     @Override
-    public ProductDTO upDateProductImage(Long productId, MultipartFile image) throws IOException {
+    public ProductDTO updateProductImage(Long productId, MultipartFile image) throws IOException {
         Product product = productRepository.findById(productId).orElseThrow(
                 () -> new ResourceNotFoundException("Product", "productId", productId)
         );

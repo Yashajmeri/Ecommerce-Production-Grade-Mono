@@ -9,6 +9,7 @@ import com.example.ecommerce.Project1.util.AuthUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -31,6 +32,7 @@ public class CartController {
      * @return the result of add product to cart.
      */
     @PostMapping("/carts/products/{productId}/quantity/{quantity}")
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
     public ResponseEntity<CartDTO> addProductToCart(@PathVariable Long productId,
                                                     @PathVariable Integer quantity) {
         CartDTO cartDTO = cartService.addProductToCart(productId, quantity);
@@ -41,7 +43,8 @@ public class CartController {
      * @return the carts.
      */
     @GetMapping("/carts")
-    public ResponseEntity<List<CartDTO>> getCarts() {
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<CartDTO>> getAllCarts() {
         List<CartDTO> cartDTOS =cartService.getAllCarts();
         return  new ResponseEntity<>(cartDTOS, HttpStatus.FOUND);
     }
@@ -50,7 +53,8 @@ public class CartController {
      * @return the carts by user.
      */
     @GetMapping("/carts/users/cart")
-    public ResponseEntity<CartDTO> getCartsByUser() {
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
+    public ResponseEntity<CartDTO> getCartByUser() {
         String emailId = authUtil.loggedInEmail();
         Cart cart = cartRepository.findCartByEmail(emailId);
         Long cartId = cart.getCartId();
@@ -64,6 +68,7 @@ public class CartController {
      * @return the result of update cart product.
      */
     @PutMapping("/cart/products/{productId}/quantity/{operation}")
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
     public  ResponseEntity<CartDTO> updateCartProduct(@PathVariable Long productId, @PathVariable String operation) {
 
         CartDTO cartDTO = cartService.updateProductQuantityInCart(productId,operation.equalsIgnoreCase("delete") ? -1 : 1);
@@ -77,6 +82,7 @@ public class CartController {
      * @return the result of delete product from the cart.
      */
     @DeleteMapping("/carts/{cartId}/product/{productId}")
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
     public ResponseEntity<String> deleteProductFromTheCart(@PathVariable Long productId,@PathVariable Long cartId) {
         String status = cartService.deleteProductFromCart(productId,cartId);
         return new ResponseEntity<>(status,HttpStatus.OK);

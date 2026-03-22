@@ -15,6 +15,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
@@ -34,10 +35,11 @@ import java.util.Set;
  */
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 @RequiredArgsConstructor
 public class WebSecurityConfig {
     private final UserDetailsService userDetailsService;
-    private final AuthEntryPointJwt unAuthorizeHandler;
+    private final AuthEntryPointJwt unauthorizedHandler;
     private final AuthTokenFilter authTokenFilter;
 
     /**
@@ -79,9 +81,9 @@ public class WebSecurityConfig {
      * @throws Exception if the operation cannot be completed.
      */
     @Bean
-    public SecurityFilterChain FilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
-                        .exceptionHandling(exp->exp.authenticationEntryPoint(unAuthorizeHandler))
+                        .exceptionHandling(exp->exp.authenticationEntryPoint(unauthorizedHandler))
                 .sessionManagement(session ->
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         http.authorizeHttpRequests((auth) -> auth.requestMatchers("/api/auth/**").permitAll()
@@ -94,7 +96,7 @@ public class WebSecurityConfig {
                 .anyRequest().authenticated());
         http.authenticationProvider(authenticationProvider());
         http.addFilterBefore(authTokenFilter, UsernamePasswordAuthenticationFilter.class);
-        http.headers(heades->heades.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin));
+        http.headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin));
         return http.build();
     }
 

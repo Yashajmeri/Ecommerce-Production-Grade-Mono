@@ -17,11 +17,11 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 /**
- * Represents the category service imlp component.
+ * Represents the category service impl component.
  */
 @Service
 @RequiredArgsConstructor
-public class CategoryServiceImlp  implements CategoryService{
+public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepository categoryRepository;
     private final ModelMapper modelMapper;
     /**
@@ -62,7 +62,7 @@ public class CategoryServiceImlp  implements CategoryService{
      * @return the result of create category.
      */
     @Override
-    public CategoryDTO CreateCategory(CategoryDTO categoryDTO) {
+    public CategoryDTO createCategory(CategoryDTO categoryDTO) {
         Category category = modelMapper.map(categoryDTO, Category.class);
 
      Category savedCategoryfromDB=categoryRepository.findByCategoryName(category.getCategoryName());
@@ -78,7 +78,7 @@ public class CategoryServiceImlp  implements CategoryService{
      * @return the result of delete category.
      */
     @Override
-    public CategoryDTO DeleteCategory(Long categoryId) {
+    public CategoryDTO deleteCategory(Long categoryId) {
         Category category = categoryRepository.findById(categoryId).orElseThrow(()->new ResourceNotFoundException("Category","CategoryId",categoryId));
          categoryRepository.delete(category);
 
@@ -92,7 +92,7 @@ public class CategoryServiceImlp  implements CategoryService{
      * @return the result of update category.
      */
     @Override
-    public CategoryDTO UpdateCategory(CategoryDTO categoryDTO, Long categoryId) {
+    public CategoryDTO updateCategory(CategoryDTO categoryDTO, Long categoryId) {
         Category category  = modelMapper.map(categoryDTO, Category.class);
         Category savedCategory = categoryRepository.findById(categoryId).orElseThrow(()-> new ResourceNotFoundException("Category","CategoryId",categoryId));
            category.setCategoryId(categoryId);

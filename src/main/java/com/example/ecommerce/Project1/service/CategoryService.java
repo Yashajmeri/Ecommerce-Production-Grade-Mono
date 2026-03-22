@@ -24,18 +24,18 @@ public interface CategoryService {
      * @param categoryDTO the categoryDTO value.
      * @return the result of create category.
      */
-    public CategoryDTO CreateCategory(CategoryDTO categoryDTO);
+    public CategoryDTO createCategory(CategoryDTO categoryDTO);
     /**
      * Deletes category.
      * @param categoryId the categoryId value.
      * @return the result of delete category.
      */
-    public CategoryDTO DeleteCategory(Long categoryId);
+    public CategoryDTO deleteCategory(Long categoryId);
     /**
      * Updates category.
      * @param categoryDTO the categoryDTO value.
      * @param categoryId the categoryId value.
      * @return the result of update category.
      */
-    public CategoryDTO UpdateCategory(CategoryDTO categoryDTO,Long categoryId);
+    public CategoryDTO updateCategory(CategoryDTO categoryDTO,Long categoryId);
 }

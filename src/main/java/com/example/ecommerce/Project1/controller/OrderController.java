@@ -7,6 +7,7 @@ import com.example.ecommerce.Project1.util.AuthUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -27,6 +28,7 @@ public class OrderController {
      * @return the result of order products.
      */
     @PostMapping("/order/users/payments/{paymentMethod}")
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
     public ResponseEntity<OrderDTO> orderProducts(@PathVariable String paymentMethod , @RequestBody OrderRequestDTO orderRequestDTO) {
           String currentEmail = authUtil.loggedInEmail();
           OrderDTO order = orderService.placeOrder(currentEmail,

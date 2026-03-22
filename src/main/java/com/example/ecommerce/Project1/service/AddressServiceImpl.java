@@ -60,7 +60,7 @@ public class AddressServiceImpl implements AddressService {
      * @return the addresses by id.
      */
     @Override
-    public AddressDTO getAddressesById(Long addressId) {
+    public AddressDTO getAddressById(Long addressId) {
         Address address = addressRepository.findById(addressId).orElseThrow(() -> new ResourceNotFoundException("Address", "id", addressId));
 
         return  modelMapper.map(address, AddressDTO.class);
@@ -85,7 +85,7 @@ public class AddressServiceImpl implements AddressService {
      * @return the result of update addresses by id.
      */
     @Override
-    public AddressDTO updateAddressesById(Long addressId, AddressDTO addressDTO) {
+    public AddressDTO updateAddressById(Long addressId, AddressDTO addressDTO) {
          Address addressFromDatabase = addressRepository.findById(addressId).orElseThrow(() -> new ResourceNotFoundException("Address", "id", addressId));
           addressFromDatabase.setCity(addressDTO.getCity());
           addressFromDatabase.setState(addressDTO.getState());
@@ -109,7 +109,7 @@ public class AddressServiceImpl implements AddressService {
      * @return the result of delete addresses by id.
      */
     @Override
-    public String  deleteAddressesById(Long addressId) {
+    public String deleteAddressById(Long addressId) {
          Address addressFromDB = addressRepository.findById(addressId).orElseThrow(() -> new ResourceNotFoundException("Address", "id", addressId));
          User user = addressFromDB.getUser();
          user.getAddresses().removeIf(address -> Objects.equals(address.getAddressId(), addressId));

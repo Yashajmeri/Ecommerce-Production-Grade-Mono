@@ -48,7 +48,7 @@ public interface ProductService {
      * @param sortOrder the sortOrder value.
      * @return the result of search by product by keyword.
      */
-    ProductResponse searchByProductByKeyword(String keyword, Integer pageNumber, Integer pageSize, String sortBy, String sortOrder);
+    ProductResponse searchProductByKeyword(String keyword, Integer pageNumber, Integer pageSize, String sortBy, String sortOrder);
 
     /**
      * Executes up date product.
@@ -56,7 +56,7 @@ public interface ProductService {
      * @param productDTO the productDTO value.
      * @return the result of up date product.
      */
-    ProductDTO upDateProduct(Long productId, ProductDTO productDTO);
+    ProductDTO updateProduct(Long productId, ProductDTO productDTO);
 
     /**
      * Deletes product.
@@ -66,11 +66,11 @@ public interface ProductService {
     ProductDTO deleteProduct(Long productId);
 
     /**
-     * Executes up date product image.
+     * Updates product image.
      * @param productId the productId value.
      * @param image the image value.
-     * @return the result of up date product image.
+     * @return the result of update product image.
      * @throws IOException if the operation cannot be completed.
      */
-    ProductDTO upDateProductImage(Long productId, MultipartFile image) throws IOException;
+    ProductDTO updateProductImage(Long productId, MultipartFile image) throws IOException;
 }

@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -27,6 +28,7 @@ public class CategoryController {
      * @return the all categories.
      */
     @GetMapping("/api/public/categories")
+    @PreAuthorize("permitAll()")
     public ResponseEntity<CategoryResponse> getAllCategories(@RequestParam(name = "pageNumber", defaultValue = AppConstant.PAGE_NUMBER,required = false) Integer PageNumber,
                                                              @RequestParam(name = "pageSize", defaultValue = AppConstant.PAGE_SIZE,required = false) Integer PageSize,
                                                              @RequestParam(name="sortBy",defaultValue = AppConstant.SORT_CATEGORIES_BY,required = false) String sortBy ,
@@ -40,8 +42,9 @@ public class CategoryController {
      * @return the result of ctreate category.
      */
     @PostMapping("/api/public/categories")
-    public ResponseEntity<CategoryDTO> CtreateCategory(@Valid @RequestBody CategoryDTO categoryDTO) {
-        CategoryDTO savedCategoryDTO = categoryService.CreateCategory(categoryDTO);
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<CategoryDTO> createCategory(@Valid @RequestBody CategoryDTO categoryDTO) {
+        CategoryDTO savedCategoryDTO = categoryService.createCategory(categoryDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedCategoryDTO);
     }
 
@@ -51,8 +54,9 @@ public class CategoryController {
      * @return the result of delete category.
      */
     @DeleteMapping("/api/admin/categories/{categoryId}")
-    public ResponseEntity<CategoryDTO> DeleteCategory(@PathVariable Long categoryId) {
-        return new ResponseEntity<>(categoryService.DeleteCategory(categoryId), HttpStatus.OK);
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<CategoryDTO> deleteCategory(@PathVariable Long categoryId) {
+        return new ResponseEntity<>(categoryService.deleteCategory(categoryId), HttpStatus.OK);
     }
 
     /**
@@ -62,9 +66,10 @@ public class CategoryController {
      * @return the result of update category.
      */
     @PutMapping("/api/admin/categories/{categoryId}")
-    public ResponseEntity<CategoryDTO> UpdateCategory(@Valid @RequestBody CategoryDTO categoryDTO, @PathVariable Long categoryId) {
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<CategoryDTO> updateCategory(@Valid @RequestBody CategoryDTO categoryDTO, @PathVariable Long categoryId) {
 
-        CategoryDTO updatedCategoryDTO = categoryService.UpdateCategory(categoryDTO, categoryId);
+        CategoryDTO updatedCategoryDTO = categoryService.updateCategory(categoryDTO, categoryId);
         return new ResponseEntity<>(updatedCategoryDTO, HttpStatus.OK);
 
     }

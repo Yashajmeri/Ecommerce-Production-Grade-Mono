@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -29,6 +30,7 @@ public class ProductController {
      * @return the result of add product.
      */
     @PostMapping("/admin/categories/{categoryId}/product")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ProductDTO> addProduct(@Valid @RequestBody ProductDTO productDTO, @PathVariable Long categoryId) {
         ProductDTO savedProductDTO = productService.addProduct(categoryId, productDTO);
         return new ResponseEntity<>(savedProductDTO, HttpStatus.CREATED);
@@ -44,6 +46,7 @@ public class ProductController {
      * @return the all products.
      */
     @GetMapping("/public/products")
+    @PreAuthorize("permitAll()")
     public ResponseEntity<ProductResponse> getAllProducts(
             @RequestParam(name = "pageNumber", defaultValue = AppConstant.PAGE_NUMBER, required = false) Integer pageNumber,
             @RequestParam(name = "pageSize", defaultValue = AppConstant.PAGE_SIZE, required = false) Integer pageSize,
@@ -64,6 +67,7 @@ public class ProductController {
      * @return the product by category.
      */
     @GetMapping("/public/categories/{categoryId}/product")
+    @PreAuthorize("permitAll()")
     public ResponseEntity<ProductResponse> getProductByCategory(
             @PathVariable Long categoryId,
             @RequestParam(name = "pageNumber", defaultValue = AppConstant.PAGE_NUMBER, required = false) Integer pageNumber,
@@ -84,13 +88,14 @@ public class ProductController {
      * @return the product by keyword.
      */
     @GetMapping("/public/products/keyword/{keyword}")
+    @PreAuthorize("permitAll()")
     public ResponseEntity<ProductResponse> getProductByKeyword(
             @PathVariable String keyword,
             @RequestParam(name = "pageNumber", defaultValue = AppConstant.PAGE_NUMBER,required = false) Integer pageNumber,
             @RequestParam(name = "pageSize", defaultValue = AppConstant.PAGE_SIZE,required = false) Integer pageSize,
             @RequestParam(name="sortBy",defaultValue = AppConstant.SORT_PRODUCTS_BY,required = false) String sortBy ,
             @RequestParam(name="sortOrder",defaultValue = AppConstant.SORT_DIR,required = false) String sortOrder) {
-        ProductResponse productResponse = productService.searchByProductByKeyword(keyword,pageNumber,pageSize,sortBy,sortOrder);
+        ProductResponse productResponse = productService.searchProductByKeyword(keyword,pageNumber,pageSize,sortBy,sortOrder);
         return new ResponseEntity<>(productResponse, HttpStatus.OK);
     }
 
@@ -101,10 +106,11 @@ public class ProductController {
      * @return the result of up date product.
      */
     @PutMapping("/admin/products/{productId}")
-    public ResponseEntity<ProductDTO> upDateProduct(@Valid @RequestBody ProductDTO productDTO, @PathVariable Long productId) {
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ProductDTO> updateProduct(@Valid @RequestBody ProductDTO productDTO, @PathVariable Long productId) {
 
-        ProductDTO upDatedproductDTO = productService.upDateProduct(productId, productDTO);
-        return new ResponseEntity<>(upDatedproductDTO, HttpStatus.OK);
+        ProductDTO updatedProductDTO = productService.updateProduct(productId, productDTO);
+        return new ResponseEntity<>(updatedProductDTO, HttpStatus.OK);
     }
 
     /**
@@ -113,23 +119,25 @@ public class ProductController {
      * @return the result of delete product.
      */
     @DeleteMapping("/admin/products/{productId}")
-    public ResponseEntity<ProductDTO> DeleteProduct(@PathVariable Long productId) {
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ProductDTO> deleteProduct(@PathVariable Long productId) {
         ProductDTO deletedProductDTO = productService.deleteProduct(productId);
         return new ResponseEntity<>(deletedProductDTO, HttpStatus.OK);
     }
 
     /**
-     * Updates productimage.
+     * Updates product image.
      * @param productId the productId value.
      * @param image the image value.
-     * @return the result of update productimage.
+     * @return the result of update product image.
      * @throws IOException if the operation cannot be completed.
      */
     @PutMapping("/products/{productId}/image")
-    public ResponseEntity<ProductDTO> updateProductimage(@PathVariable Long productId, @RequestParam("image") MultipartFile image) throws IOException {
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ProductDTO> updateProductImage(@PathVariable Long productId, @RequestParam("image") MultipartFile image) throws IOException {
 
-        ProductDTO upDatedPrductDTO = productService.upDateProductImage(productId, image);
-        return new ResponseEntity<>(upDatedPrductDTO, HttpStatus.OK);
+        ProductDTO updatedProductDTO = productService.updateProductImage(productId, image);
+        return new ResponseEntity<>(updatedProductDTO, HttpStatus.OK);
     }
 }
 
